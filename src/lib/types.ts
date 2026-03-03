@@ -19,6 +19,11 @@ export interface ShoppingItem {
 	reportedHistory?: ReportedLogEntry[];
 }
 
+export interface ReportedLogEntry {
+    date: number;
+    change: number;
+}
+
 export interface Store {
 	name: string;
 }
@@ -26,16 +31,8 @@ export interface Store {
 export interface Food {
 	id: string;
 	name: string;
-	ingredients: string[]; // product names
-	frequency: number; // days between uses
-	createdDate: number;
-}
-
-export interface Food {
-	id: string;
-	name: string;
 	frequency: number; // in days
-	ingredients: string[]; // ingredient names (can be mapped to ShoppingItem.name)
+	productIds: string[]; // ShoppingItem.id[]
 	links: string[];
 	tags: string[];
 	createdDate: number;

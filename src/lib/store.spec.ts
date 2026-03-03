@@ -56,7 +56,7 @@ describe('shopping store', () => {
 
 		// advance clock a day and change reported
 		vi.setSystemTime(Date.now() + 24 * 60 * 60 * 1000);
-		store.updateReported(original.id, 3);
+		store.updateReported(original.id, 3, 1);
 
 		expect(items[0].reported).toBe(3);
 		expect(items[0].lastBuyDate).toBe(Date.now());
@@ -66,8 +66,8 @@ describe('shopping store', () => {
 		expect(entry.date).toBe(Date.now());
 
 		// updating again with a lower value should record a negative change
-		vi.setSystemTime(Date.now() + 1000);
-		store.updateReported(original.id, 1.5);
+		vi.setSystemTime(Date.now() + 11 * 60 * 1000);
+		store.updateReported(original.id, 1.5, -1.5);
 		const hist = items[0].reportedHistory!;
 		expect(hist).toHaveLength(2);
 		expect(hist[1].change).toBeCloseTo(-1.5);

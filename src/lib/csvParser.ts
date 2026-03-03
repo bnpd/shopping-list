@@ -114,6 +114,15 @@ export function parseDate(dateString: string): number {
 	return Number.NaN;
 }
 
+function normalizeName(s: string) {
+    return s.replace(/\([^)]*\)/g, '') // remove parentheses content
+        .replace(/[\p{Emoji_Presentation}\p{Emoji}\u200d]/gu, '') // remove emojis
+        .replace(/['"`]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
+}
+
 export type IncomingShoppingItem = Omit<ShoppingItem, 'id' | 'createdDate'> & { lastBuyDate?: number };
 
 export function convertCSVRowToItem(row: CSVRow): IncomingShoppingItem | null {
@@ -186,30 +195,39 @@ function extractTags(tagsString: string): string[] {
 	return tagsString.split(',').map(t => t.trim()).filter(Boolean);
 }
 
-export function convertCSVRowToFood(row: CSVRow): Omit<Food, 'id' | 'createdDate'> | null {
+export function convertCSVRowToFood(row: CSVRow, shoppingItems: ShoppingItem[]): Omit<Food, 'id' | 'createdDate'> | null {
 	const name = row['Name']?.trim();
 	if (!name) return null;
 
 	const freqStr = row['Frequenz (Tage Abstand)'] || row['Frequenz (Tage Abstand)'] || '';
 	const frequency = parseFrequency(freqStr) || 1;
 
-	const ingredients = extractIngredients(row['Ingredients'] || row['Ingredients'] || '');
+	const ingredientNames = extractIngredients(row['Ingredients'] || row['Ingredients'] || '');
 	const links = extractLinks(row);
 	const tags = extractTags(row['Tags'] || '');
+
+	const productIds: string[] = [];
+    for (const ingName of ingredientNames) {
+        const normalizedIngName = normalizeName(ingName);
+        const foundItem = shoppingItems.find(item => normalizeName(item.name) === normalizedIngName);
+        if (foundItem) {
+            productIds.push(foundItem.id);
+        }
+    }
 
 	return {
 		name,
 		frequency,
-		ingredients,
+		productIds,
 		links,
 		tags
 	};
 }
 
-export function convertCSVToFoods(csvText: string): Array<Omit<Food, 'id' | 'createdDate'>> {
+export function convertCSVToFoods(csvText: string, shoppingItems: ShoppingItem[]): Array<Omit<Food, 'id' | 'createdDate'>> {
 	const rows = parseCSV(csvText);
 	const foods = rows
-		.map(row => convertCSVRowToFood(row))
+		.map(row => convertCSVRowToFood(row, shoppingItems))
 		.filter((f): f is Omit<Food, 'id' | 'createdDate'> => f !== null);
 
 	return foods;

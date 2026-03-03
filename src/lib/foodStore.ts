@@ -4,14 +4,7 @@ import { shoppingItems } from './store';
 
 const STORAGE_KEY = 'shopping-list-foods';
 
-function normalizeName(s: string) {
-    return s.replace(/\([^)]*\)/g, '') // remove parentheses content
-        .replace(/[\p{Emoji_Presentation}\p{Emoji}\u200d]/gu, '') // remove emojis
-        .replace(/['"`]/g, '')
-        .replace(/\s+/g, ' ')
-        .trim()
-        .toLowerCase();
-}
+
 
 function createFoodStore() {
     const { subscribe, set, update } = writable<Food[]>([]);
@@ -59,21 +52,9 @@ function createFoodStore() {
             const food = foodsSnapshot.find(f => f.id === id);
             if (!food) return;
 
-            const ingredients = food.ingredients.map(i => normalizeName(i));
-
-            let itemsSnapshot: ShoppingItem[] = [];
-            const unsub2 = shoppingItems.subscribe(v => itemsSnapshot = v);
-            unsub2();
-
-            const matchedIds: string[] = [];
-            for (const it of itemsSnapshot) {
-                const n = normalizeName(it.name);
-                if (ingredients.some(ing => n.includes(ing) || ing.includes(n))) {
-                    matchedIds.push(it.id);
-                }
+            if (food.productIds.length > 0) {
+                shoppingItems.setRequestedBulk(food.productIds, true);
             }
-
-            if (matchedIds.length > 0) shoppingItems.setRequestedBulk(matchedIds, true);
         },
         clear: () => {
             if (typeof window !== 'undefined') localStorage.removeItem(STORAGE_KEY);

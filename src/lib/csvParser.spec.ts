@@ -3,9 +3,12 @@ import {
 	parseCSV,
 	convertCSVRowToItem,
 	convertCSVToItems,
+	convertCSVToFoods,
 	type CSVRow,
 	type IncomingShoppingItem
 } from './csvParser';
+import type { ShoppingItem } from './types';
+
 
 // Note: parseDate is not exported currently; we need to export it to test or test indirectly via conversion.
 
@@ -50,4 +53,23 @@ describe('csvParser utilities', () => {
 		expect(item.name).toBe('eggs');
 		expect(item.lastBuyDate).toBe(Date.parse(yesterday));
 	});
+});
+
+describe('Food CSV Parsing', () => {
+    it('convertCSVToFoods maps ingredient names to product IDs', () => {
+        const shoppingItems: ShoppingItem[] = [
+            { id: '1', name: 'Milk', price: 10, frequency: 7, lastBuyDate: 0, reported: 1, lifespan: 7, stores: [], createdDate: 0 },
+            { id: '2', name: 'Bread', price: 20, frequency: 7, lastBuyDate: 0, reported: 1, lifespan: 7, stores: [], createdDate: 0 },
+            { id: '3', name: 'Eggs', price: 30, frequency: 14, lastBuyDate: 0, reported: 1, lifespan: 21, stores: [], createdDate: 0 }
+        ];
+
+        const csv = `Name,Ingredients
+Breakfast,"Milk,Eggs"`;
+
+        const foods = convertCSVToFoods(csv, shoppingItems);
+
+        expect(foods).toHaveLength(1);
+        expect(foods[0].name).toBe('Breakfast');
+        expect(foods[0].productIds).toEqual(['1', '3']);
+    });
 });

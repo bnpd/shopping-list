@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { foods } from '$lib/foodStore';
 	import { convertCSVToFoods } from '$lib/csvParser';
+	import { shoppingItems } from '$lib/store';
+	import type { Food } from '$lib/types';
 
 	let { onClose }: { onClose: () => void } = $props();
 
 	let csvContent = $state('');
-	let preview = $state<any[]>([]);
+	let preview = $state<Omit<Food, 'id' | 'createdDate'>[]>([]);
 	let error = $state('');
+	const allShoppingItems = $shoppingItems;
 
 	function handleFile(event: Event) {
 		const input = event.target as HTMLInputElement;
@@ -26,12 +29,14 @@
 				error = 'No CSV content';
 				return;
 			}
-			preview = convertCSVToFoods(csvContent);
+			preview = convertCSVToFoods(csvContent, allShoppingItems);
 			if (preview.length === 0) {
 				error = 'No valid foods found';
+			} else {
+				error = '';
 			}
-		} catch (e) {
-			error = 'Parse error';
+		} catch (e: any) {
+			error = 'Parse error: ' + e.message;
 			preview = [];
 		}
 	}
@@ -40,6 +45,13 @@
 		if (preview.length === 0) return;
 		foods.importFoods(preview);
 		onClose();
+	}
+
+	function getIngredientNames(productIds: string[]): string[] {
+		return productIds.map(id => {
+			const item = allShoppingItems.find(it => it.id === id);
+			return item ? item.name : 'Unknown';
+		});
 	}
 </script>
 
@@ -69,7 +81,7 @@
 					{#each preview as f (f.name)}
 						<div class="p-2 border rounded bg-gray-50">
 							<div class="font-medium">{f.name}</div>
-							<div class="text-xs text-gray-600">Freq: {f.frequency}d · Ingredients: {f.ingredients.join(', ')}</div>
+							<div class="text-xs text-gray-600">Freq: {f.frequency}d · Ingredients: {getIngredientNames(f.productIds).join(', ')}</div>
 						</div>
 					{/each}
 				</div>
@@ -78,7 +90,7 @@
 			<div class="flex justify-end gap-2">
 				<button onclick={() => onClose()} class="px-4 py-2 bg-gray-200 rounded">Cancel</button>
 				<button onclick={previewCSV} class="px-4 py-2 bg-blue-500 text-white rounded">Preview</button>
-				<button onclick={importFoods} class="px-4 py-2 bg-green-500 text-white rounded">Import {preview.length}</button>
+				<button onclick={importFoods} class="px-4 py-2 bg-green-500 text-white rounded" disabled={preview.length === 0}>Import {preview.length}</button>
 			</div>
 		</div>
 	</div>
