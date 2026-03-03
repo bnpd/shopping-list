@@ -92,11 +92,12 @@
 						>
 							Price{getSortIndicator('price')}
 						</th>
+						<th class="px-4 py-2 text-left font-semibold text-gray-900">Dishes</th>
 						<th
 							class="px-4 py-2 text-left font-semibold text-gray-900 cursor-pointer hover:bg-gray-100"
 							onclick={() => toggleSort('lastBuyDate')}
 						>
-							Last Updated{getSortIndicator('lastBuyDate')}
+							Last Purchased{getSortIndicator('lastBuyDate')}
 						</th>
 						<th class="px-4 py-2 text-left font-semibold text-gray-900">Stores</th>
 						<th class="px-4 py-2 text-left font-semibold text-gray-900">Actions</th>

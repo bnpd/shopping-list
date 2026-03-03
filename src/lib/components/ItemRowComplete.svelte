@@ -2,6 +2,7 @@
 	import type { ShoppingItem } from '$lib/types';
 	import { formatDate, calculateNextDueDate, daysUntilDate, estimateDaysPerUnit, remainingAmount } from '$lib/dateUtils';
 	import { shoppingItems } from '$lib/store';
+    import { foods } from '$lib/foodStore';
 
 	let { item }: { item: ShoppingItem; compact?: boolean } = $props();
 
@@ -74,12 +75,20 @@
 	<td class="px-2 py-1 text-sm text-gray-700">{estDays < Number.POSITIVE_INFINITY ? `${Math.round(estDays)}d` : ''}</td>
 	<td class="px-2 py-1 text-sm text-gray-700">{estDaysRecent < Number.POSITIVE_INFINITY ? `${Math.round(estDaysRecent)}d` : ''}</td>
 	<td class="px-2 py-1 text-sm text-gray-700">
-		$<input
+		<input
 			type="number"
 			value={item.price.toFixed(2)}
 			onblur={(e) => shoppingItems.updateItem(item.id, { price: parseFloat((e.target as HTMLInputElement).value) })}
 			class="w-20 bg-transparent border-none p-0 m-0"
 		/>
+	</td>
+	<td class="flex flex-col px-2 py-1 text-sm text-gray-700" style="max-height: 3rem; overflow-y: auto">
+	{#each $foods.filter(f => f.productIds.includes(item.id)) as food}
+		<div class="px-1 py-0.5 bg-gray-50 rounded text-xs mb-1" style="width: max-content; max-width: 10rem;">
+			{food.name}
+		</div>
+		
+	{/each}
 	</td>
 	<td class="px-2 py-1 text-sm text-gray-700">
 		<input

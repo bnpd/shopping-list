@@ -38,5 +38,5 @@ export interface Food {
 	createdDate: number;
 }
 
-export type SortColumn = 'name' | 'reported' | 'due' | 'frequency' | 'price' | 'updated' | 'nextDue' | 'needed';
+export type SortColumn = 'name' | 'reported' | 'due' | 'frequency' | 'price' | 'updated' | 'nextDue' | 'needed' | 'lastBuyDate';
 export type SortDirection = 'asc' | 'desc';
