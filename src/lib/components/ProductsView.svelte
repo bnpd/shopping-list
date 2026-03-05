@@ -9,13 +9,13 @@
 	let items = $derived.by(() => {
 		const allItems = $shoppingItems;
 		const sorted = [...allItems].sort((a, b) => {
-			let aVal: any = a[sortColumn];
-			let bVal: any = b[sortColumn];
+			let aVal = a[sortColumn as keyof typeof a];
+			let bVal = b[sortColumn as keyof typeof b];
 
-			if (sortColumn === 'due' || sortColumn === 'updated' || sortColumn === 'nextDue') {
-				// Already timestamps
-			} else if (aVal === undefined || bVal === undefined) {
-				return 0;
+			if (!aVal) {
+				return sortDirection === 'asc' ? 1 : -1;
+			} else if (!bVal) {
+				return sortDirection === 'asc' ? -1 : 1;
 			}
 
 			if (typeof aVal === 'string') {
