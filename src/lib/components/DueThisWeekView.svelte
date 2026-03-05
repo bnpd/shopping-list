@@ -19,12 +19,6 @@
 </script>
 
 <div class="space-y-4">
-	<div class="flex items-center gap-4">
-		<h1 class="text-2xl font-bold text-gray-900">Due This Week</h1>
-		<button onclick={loadFilteredItems}>⟳</button>
-		<button onclick={()=>addTempItem = true}>+</button>
-	</div>
-
 	{#if items.length === 0}
 		<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-blue-700">
 			<p>No items due this week. Great job!</p>
@@ -34,7 +28,13 @@
 			<table class="w-full text-sm">
 				<thead class="bg-gray-50 border-b border-gray-300">
 					<tr>
-						<th class="px-2 py-2 text-left font-semibold text-gray-900">Name</th>
+						<th class="px-2 py-2 text-left font-semibold text-gray-900">
+							<div class="flex items-center gap-6">
+								Name
+								<button onclick={loadFilteredItems}>⟳</button>
+								<button onclick={()=>addTempItem = true}>+</button>
+							</div>
+						</th>
 						<th class="px-2 py-2 text-left font-semibold text-gray-900">Remaining</th>
 						<th class="px-2 py-2 text-left font-semibold text-gray-900">Due</th>
 						<th class="px-2 py-2 text-left font-semibold text-gray-900">☑</th>

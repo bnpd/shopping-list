@@ -47,8 +47,6 @@
 </script>
 
 <div class="space-y-4">
-	<h1 class="text-2xl font-bold text-gray-900">All Products</h1>
-
 	{#if items.length === 0}
 		<div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-gray-700">
 			<p>No products yet. Add your first product to get started!</p>
