@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { foods } from '$lib/foodStore';
 	import { shoppingItems } from '$lib/store';
+    import type { Food } from '$lib/types';
 	import FoodRow from './FoodRow.svelte';
-
-	let allFoods = $derived($foods);
-	const allShoppingItems = $shoppingItems;
 
 	let name = $state('');
 	let selectedProductIds: string[] = $state([]);
 	let frequency = 7;
+	let ingredientSearchTerm = $state('');
 	let searchTerm = $state('');
+
+	let filteredFoods = $derived(filterFoods($foods, searchTerm));
+	const allShoppingItems = $shoppingItems;
 
 	function addFood() {
 		foods.addFood({
@@ -31,28 +33,40 @@
 		}
 	}
 
-	let filteredItems = $derived(allShoppingItems.filter((item) => 
-		item.name.toLowerCase().includes(searchTerm.toLowerCase())
+	function filterFoods(foods: Food[], term: string): Food[] {
+		if (!term.trim()) return foods;
+		return foods.filter(food => 
+			food.name.toLowerCase().includes(term.toLowerCase())
+			|| food.tags.some(tag => tag.toLowerCase().includes(term.toLowerCase()))
+			|| food.productIds.some(pid => {
+				const item = allShoppingItems.find(it => it.id === pid);
+				return item?.name.toLowerCase().includes(term.toLowerCase());
+			})
+		);
+	}
+
+	let filteredProducts = $derived(allShoppingItems.filter((item) => 
+		item.name.toLowerCase().includes(ingredientSearchTerm.toLowerCase())
 	));
 </script>
 
 <div class="space-y-4">
 	<div class="flex flex-col justify-between items-center">
-		<h2 class="text-xl font-bold">Foods</h2>
+		<input placeholder="Search foods..." bind:value={searchTerm} class="px-2 py-1 border rounded w-full max-w-md" />
 		<div class="flex flex-col gap-2">
 			<input placeholder="Name" bind:value={name} class="px-2 py-1 border rounded" />
 			<div class="flex flex-col">
 				<input 
 					placeholder="Search ingredients..." 
-					bind:value={searchTerm} 
+					bind:value={ingredientSearchTerm} 
 					onkeypress={(e) => {
-						if (e.key === 'Enter' && filteredItems.length > 0) { 
+						if (e.key === 'Enter' && filteredProducts.length > 0) { 
 							e.preventDefault(); 
-							toggleSelection(filteredItems[0].id);
+							toggleSelection(filteredProducts[0].id);
 						}}}
 					class="px-2 py-1 border rounded text-sm" />
 				<div class="px-2 py-1 border rounded w-72 h-32 overflow-y-auto bg-white">
-					{#each filteredItems as item}
+					{#each filteredProducts as item}
 						<label class="py-1 flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50">
 							<input 
 								type="checkbox" 
@@ -64,7 +78,7 @@
 					{/each}
 					{#each selectedProductIds as id}
 						{@const item = allShoppingItems.find(it => it.id === id)!}
-						{#if !filteredItems.includes(item)}
+						{#if !filteredProducts.includes(item)}
 							<label class="py-1 flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50">
 								<input 
 									type="checkbox" 
@@ -85,10 +99,10 @@
 	</div>
 
 	<div class="border rounded overflow-hidden">
-		{#each allFoods as food (food.id)}
+		{#each filteredFoods as food (food.id)}
 			<FoodRow {food} />
 		{/each}
-		{#if allFoods.length === 0}
+		{#if filteredFoods.length === 0}
 			<div class="p-4 text-gray-600">No foods yet. Use CSV import or add one.</div>
 		{/if}
 	</div>
