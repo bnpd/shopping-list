@@ -24,11 +24,20 @@
 </script>
 
 <div class="flex items-center justify-between p-2 border-b">
-    <div>
-        <div class="font-medium">{food.name}</div>
-        <div class="text-xs text-gray-600">Ingredients: {ingredientNames.join(', ')}</div>
+    <div class="flex flex-col gap-3 text-xs">
+        <div class="font-bold">{food.name}</div>
+        <div class="flex flex-wrap gap-1">
+            {#each ingredientNames as name (name)}
+                <span class="bg-gray-200 px-2 py-1 rounded">{name}</span>
+            {/each}
+        </div>
+        <div class="flex flex-wrap gap-1">
+            {#each food.tags as tag (tag)}
+                <span class="bg-gray-50 px-2 py-1 rounded">{tag}</span>
+            {/each}
+        </div>
     </div>
-    <div class="flex gap-2">
+    <div class="flex flex-col gap-2">
         <button onclick={buy} class="px-3 py-1 bg-green-500 text-white rounded">Buy</button>
         <button onclick={deleteFood} class="px-3 py-1 bg-red-500 text-white rounded">Delete</button>
     </div>
