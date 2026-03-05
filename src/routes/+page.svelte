@@ -6,8 +6,6 @@
 	import AddProductModal from '$lib/components/AddProductModal.svelte';
 	import ImportCSVModal from '$lib/components/ImportCSVModal.svelte';
 	import ImportFoodModal from '$lib/components/ImportFoodModal.svelte';
-	import { shoppingItems } from '$lib/store';
-	import { foods } from '$lib/foodStore';
 
 	type View = 'all' | 'due-this-week' | 'foods' | 'no-consumption';
 
