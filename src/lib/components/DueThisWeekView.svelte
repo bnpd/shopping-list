@@ -25,12 +25,12 @@
 </script>
 
 <div class="space-y-4">
+	<input placeholder="Search items..." bind:value={searchTerm} onkeyup={() => items =loadFilteredItems()} class="px-2 py-1 border rounded w-full max-w-md" />
 	{#if items.length === 0}
 		<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-blue-700">
 			<p>No items due this week. Great job!</p>
 		</div>
 	{:else}
-		<input placeholder="Search items..." bind:value={searchTerm} onkeyup={() => items =loadFilteredItems()} class="px-2 py-1 border rounded w-full max-w-md" />
 		<div class="overflow-x-auto border border-gray-300 rounded-lg">
 			<table class="w-full text-sm">
 				<thead class="bg-gray-50 border-b border-gray-300">

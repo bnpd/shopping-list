@@ -1,14 +1,23 @@
 <script lang="ts">
+    import { foods } from '$lib/foodStore';
 	import { shoppingItems } from '$lib/store';
 	import type { SortColumn, SortDirection } from '$lib/types';
     import ItemRowComplete from './ItemRowComplete.svelte';
 
 	let sortColumn: SortColumn = $state('name');
 	let sortDirection: SortDirection = $state('asc');
+	let searchTerm = $state('');
 
 	let items = $derived.by(() => {
-		const allItems = $shoppingItems;
-		const sorted = [...allItems].sort((a, b) => {
+		let items = $shoppingItems;
+		if (searchTerm.trim()) {
+			items = items.filter(item => 
+				item.name.toLowerCase().includes(searchTerm.toLowerCase())
+				|| item.stores.some(store => store.toLowerCase().includes(searchTerm.toLowerCase()))
+				|| $foods.some(food => food.productIds.includes(item.id) && food.name.toLowerCase().includes(searchTerm.toLowerCase()))
+			);
+		}
+		const sorted = [...items].sort((a, b) => {
 			let aVal = a[sortColumn as keyof typeof a];
 			let bVal = b[sortColumn as keyof typeof b];
 
@@ -47,6 +56,7 @@
 </script>
 
 <div class="space-y-4">
+	<input placeholder="Search products..." bind:value={searchTerm} class="px-2 py-1 border rounded w-full max-w-md" />
 	{#if items.length === 0}
 		<div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-gray-700">
 			<p>No products yet. Add your first product to get started!</p>
