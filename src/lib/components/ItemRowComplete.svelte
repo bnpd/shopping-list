@@ -83,7 +83,7 @@
 		/>
 	</td>
 	<td class="flex flex-col px-2 py-1 text-sm text-gray-700" style="max-height: 3rem; overflow-y: auto">
-	{#each $foods.filter(f => f.productIds.includes(item.id)) as food}
+	{#each $foods.filter(f => f.productIds?.includes(item.id)) as food}
 		<div class="px-1 py-0.5 bg-gray-50 rounded text-xs mb-1" style="width: max-content; max-width: 10rem;">
 			{food.name}
 		</div>
