@@ -52,7 +52,6 @@
 
 <div class="space-y-4">
 	<div class="flex flex-col justify-between items-center">
-		<input placeholder="Search foods..." bind:value={searchTerm} class="px-2 py-1 border rounded w-full max-w-md" />
 		<div class="flex flex-col gap-2">
 			<input placeholder="Name" bind:value={name} class="px-2 py-1 border rounded" />
 			<div class="flex flex-col">
@@ -97,6 +96,7 @@
 			<button onclick={addFood} class="px-3 py-1 bg-blue-500 text-white rounded">Add</button>
 		</div>
 	</div>
+	<input placeholder="Search foods..." bind:value={searchTerm} class="px-2 py-1 border rounded w-full max-w-md" />
 
 	<div class="border rounded overflow-hidden">
 		{#each filteredFoods as food (food.id)}
