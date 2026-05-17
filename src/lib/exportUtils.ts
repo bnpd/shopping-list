@@ -18,7 +18,7 @@ export function exportProducts(products: ShoppingItem[]) {
 
         rows.push([
             item.name,
-            String(item.frequency),
+            String(item.frequency || ''),
             String(item.price),
             stores,
             String(item.reported),
