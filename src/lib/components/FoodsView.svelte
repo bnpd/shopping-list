@@ -24,7 +24,6 @@
 		name = '';
 		selectedProductIds = [];
 	}
-
 	function toggleSelection(id: string) {
 		if (selectedProductIds.includes(id)) {
 			selectedProductIds = selectedProductIds.filter(pid => pid !== id);

@@ -2,11 +2,13 @@
     import { foods } from '$lib/foodStore';
 	import { shoppingItems } from '$lib/store';
 	import type { SortColumn, SortDirection } from '$lib/types';
+    import AddProductModal from './AddProductModal.svelte';
     import ItemRowComplete from './ItemRowComplete.svelte';
 
 	let sortColumn: SortColumn = $state('name');
 	let sortDirection: SortDirection = $state('asc');
 	let searchTerm = $state('');
+	let showAddModal = $state(false);
 
 	let items = $derived.by(() => {
 		let items = $shoppingItems;
@@ -57,6 +59,12 @@
 
 <div class="space-y-4">
 	<input placeholder="Search products..." bind:value={searchTerm} class="px-2 py-1 border rounded w-full max-w-md" />
+	<button
+		onclick={() => (showAddModal = true)}
+		class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition font-medium"
+	>
+		+ Add Product
+	</button>
 	{#if items.length === 0}
 		<div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-gray-700">
 			<p>No products yet. Add your first product to get started!</p>
@@ -120,3 +128,7 @@
 		</div>
 	{/if}
 </div>
+
+{#if showAddModal}
+	<AddProductModal onClose={() => (showAddModal = false)} />
+{/if}
