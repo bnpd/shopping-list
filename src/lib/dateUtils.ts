@@ -51,9 +51,7 @@ export function estimateDaysPerUnit(reportedHistory?: ReportedEntry[], limitDays
 	let daysWindow = (now - reportedHistory[0].date) / (24 * 60 * 60 * 1000);
 	if (limitDaysWindow && limitDaysWindow < daysWindow) daysWindow = limitDaysWindow;
 
-	const threeMonthsAgo = now - daysWindow * 24 * 60 * 60 * 1000;
-
-	const positives = reportedHistory.filter(r => r.change > 0 && r.date >= threeMonthsAgo);
+	const positives = reportedHistory.filter(r => r.change > 0 && r.date >= now - daysWindow * 24 * 60 * 60 * 1000);
 
 	if (positives.length === 0) return Number.POSITIVE_INFINITY;
 
