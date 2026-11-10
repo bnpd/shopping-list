@@ -75,14 +75,14 @@ export function createShoppingStore() {
 						const lastEntry = item.reportedHistory?.[item.reportedHistory.length - 1];
 						const shouldMerge = lastEntry && (now - lastEntry.date) < 10 * 60 * 1000; // 10 minute threshold for merging
 
-						const newEntry = { date: now, change };
+						const newEntry = { date: now, change, reported };
 						
 						let updatedHistory = item.reportedHistory;
 						if (Math.abs(change) > 0.05) {
 							if (shouldMerge) {
 								updatedHistory = [
 									...item.reportedHistory!.slice(0, -1),
-									{ ...lastEntry, change: lastEntry.change + change }
+									{ ...lastEntry, change: lastEntry.change + change, reported }
 								];
 							} else {
 								updatedHistory = [...(item.reportedHistory ?? []), newEntry];

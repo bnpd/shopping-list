@@ -22,6 +22,7 @@ export interface ShoppingItem {
 export interface ReportedLogEntry {
     date: number;
     change: number;
+    reported?: number;
 }
 
 export interface Store {

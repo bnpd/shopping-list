@@ -39,26 +39,37 @@ export function getItemsDueThisWeek(items: ShoppingItem[]): ShoppingItem[] {
 		.sort((a, b) => a.nextDue - b.nextDue);
 }
 
-export type ReportedEntry = { date: number; change: number };
+export type ReportedEntry = { date: number; change: number; reported?: number };
 
-// Estimate how many days one unit lasts based on positive reportedHistory entries
+// Estimate how many days one unit lasts based on positive (> 0.5) reportedHistory entries
 // Uses only entries from last $limitDaysWindow days, or all available history.
-// Calculation: daysPerUnit = daysWindow / totalPositiveChange
-// Returns Number.POSITIVE_INFINITY when there's no positive consumption in window.
+// The reported quantity at the start and end of the window adjusts purchases for stock changes.
+// When snapshots are available, the elapsed window ends at the last entry's date.
+// Returns Number.POSITIVE_INFINITY when there's no estimated consumption in the window.
 export function estimateDaysPerUnit(reportedHistory?: ReportedEntry[], limitDaysWindow?: number): number {
 	if (!reportedHistory || reportedHistory.length === 0) return Number.POSITIVE_INFINITY;
 	const now = Date.now();
-	let daysWindow = (now - reportedHistory[0].date) / (24 * 60 * 60 * 1000);
+	const dayInMs = 24 * 60 * 60 * 1000;
+	let daysWindow = (now - reportedHistory[0].date) / dayInMs;
 	if (limitDaysWindow && limitDaysWindow < daysWindow) daysWindow = limitDaysWindow;
 
-	// Filter for positive consumption entries within the daysWindow
-	// consider only entries where change > 0.5 cause smaller adjustments are likely corrections, not actual purchases
-	const positives = reportedHistory.filter(r => r.change > 0.5 && r.date >= now - daysWindow * 24 * 60 * 60 * 1000);
+	const windowEntries = reportedHistory.filter(r => r.date >= now - daysWindow * 24 * 60 * 60 * 1000);
+	// Changes over 0.5 are treated as purchases; smaller changes are likely corrections.
+	const totalPurchased = windowEntries
+		.filter(r => r.change > 0.5)
+		.reduce((sum, r) => sum + r.change, 0);
+	const firstEntry = windowEntries[0];
+	const lastEntry = windowEntries.at(-1);
+	const stockAdjustment =
+		firstEntry?.reported !== undefined && lastEntry?.reported !== undefined
+			? firstEntry.reported - firstEntry.change - lastEntry.reported
+			: 0;
+	const totalConsumed = totalPurchased + stockAdjustment;
+	if (firstEntry?.reported !== undefined && lastEntry?.reported !== undefined) {
+		daysWindow = (lastEntry.date - firstEntry.date) / dayInMs;
+	}
 
-	if (positives.length === 0) return Number.POSITIVE_INFINITY;
-
-	const totalConsumed = positives.reduce((sum, r) => sum + r.change, 0);
-	if (totalConsumed <= 0) return Number.POSITIVE_INFINITY;
+	if (totalConsumed <= 0 || daysWindow <= 0) return Number.POSITIVE_INFINITY;
 
 	return daysWindow / totalConsumed;
 }
